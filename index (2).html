@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Connect - AI-Powered Campus Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #FFFFFF;
+            color: #1F2937;
+            overflow-x: hidden;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes ripple {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(4); opacity: 0; }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        @keyframes countUp {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        .slide-up {
+            animation: slideUp 0.4s ease-out forwards;
+        }
+        
+        .slide-in-left {
+            animation: slideInLeft 0.4s ease-out forwards;
+        }
+        
+        .bounce-in {
+            animation: bounce 0.6s ease-out;
+        }
+        
+        .pulse-animate {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .shake-animate {
+            animation: shake 0.3s ease-in-out;
+        }
+        
+        /* 3D Card Effects */
+        .card-3d {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d;
+        }
+        
+        .card-3d:hover {
+            transform: translateY(-8px) rotateX(5deg);
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Button Ripple Effect */
+        .btn-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn-ripple:active::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* Gradient Backgrounds */
+        .gradient-blue {
+            background: linear-gradient(135deg, #3B82F6, #06B6D4);
+        }
+        
+        .gradient-card {
+            background: linear-gradient(135deg, #EFF6FF, #E0F2FE);
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            animation: slideInLeft 0.3s ease-out;
+        }
+        
+        .toast-success {
+            background: #10B981;
+            color: white;
+        }
+        
+        .toast-error {
+            background: #EF4444;
+            color: white;
+        }
+        
+        /* Progress Bar Animation */
+        .progress-bar {
+            transition: width 1s ease-out;
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid #F3F4F6;
+            border-top: 3px solid #3B82F6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Modal Backdrop */
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        
+        /* Stagger Animation Delays */
+        .stagger-1 { animation-delay: 0ms; }
+        .stagger-2 { animation-delay: 50ms; }
+        .stagger-3 { animation-delay: 100ms; }
+        .stagger-4 { animation-delay: 150ms; }
+        .stagger-5 { animation-delay: 200ms; }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #F3F4F6;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 640px) {
+            .bottom-nav {
+                display: flex;
+            }
+        }
+        
+        @media (min-width: 641px) {
+            .bottom-nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="module">
+        // ============================================
+        // MOCK DATA INITIALIZATION
+        // ============================================
+        
+        const initMockData = () => {
+            if (!localStorage.getItem('campusConnectInitialized')) {
+                const mockEvents = [
+                    { id: 1, title: 'Tech Fest 2025', date: '2025-11-05', time: '10:00 AM', location: 'Main Auditorium', category: 'Tech', department: 'CSE', description: 'Annual technology festival', rsvpCount: 156, matchScore: 95, reason: 'Similar students in CSE attended this' },
+                    { id: 2, title: 'AI/ML Workshop', date: '2025-11-08', time: '2:00 PM', location: 'Lab 301', category: 'Academic', department: 'CSE', description: 'Hands-on machine learning workshop', rsvpCount: 89, matchScore: 92, reason: 'Matches your interest in AI' },
+                    { id: 3, title: 'Cultural Night', date: '2025-11-10', time: '6:00 PM', location: 'Open Theatre', category: 'Cultural', department: 'All', description: 'Annual cultural celebration', rsvpCount: 234, matchScore: 78, reason: 'Popular among your peers' },
+                    { id: 4, title: 'Hackathon 2025', date: '2025-11-12', time: '9:00 AM', location: 'Innovation Center', category: 'Tech', department: 'CSE', description: '24-hour coding competition', rsvpCount: 112, matchScore: 96, reason: 'Matches your hackathon interest' },
+                    { id: 5, title: 'Sports Meet', date: '2025-11-15', time: '7:00 AM', location: 'Sports Complex', category: 'Sports', department: 'All', description: 'Inter-department sports competition', rsvpCount: 189, matchScore: 75, reason: 'Building well-rounded profile' },
+                    { id: 6, title: 'Web Development Bootcamp', date: '2025-11-18', time: '3:00 PM', location: 'CS Lab', category: 'Tech', department: 'CSE', description: 'Full-stack development training', rsvpCount: 67, matchScore: 89, reason: 'Aligns with your tech interests' },
+                    { id: 7, title: 'Guest Lecture: Industry Trends', date: '2025-11-20', time: '11:00 AM', location: 'Seminar Hall', category: 'Academic', department: 'All', description: 'Tech industry expert talk', rsvpCount: 145, matchScore: 85, reason: 'Career-focused event for CS students' },
+                    { id: 8, title: 'Music Festival', date: '2025-11-22', time: '5:00 PM', location: 'Campus Ground', category: 'Cultural', department: 'All', description: 'Live band performances', rsvpCount: 298, matchScore: 72, reason: 'Social engagement opportunity' }
+                ];
+                
+                const mockComplaints = [
+                    { id: 1, studentId: 'student@college.edu', title: 'WiFi not working in hostel', description: 'Internet connectivity issues in Block A hostel since 3 days', category: 'Facilities', priority: 'High', status: 'In Progress', dateSubmitted: '2025-10-20', anonymous: false, aiConfidence: 'High', daysPending: 5, assignedTo: 'IT Department' },
+                    { id: 2, studentId: 'student@college.edu', title: 'Lab equipment broken', description: 'Oscilloscope in Electronics Lab not functioning', category: 'Academic', priority: 'Normal', status: 'Open', dateSubmitted: '2025-10-22', anonymous: false, aiConfidence: 'High', daysPending: 3, assignedTo: 'Electronics Department' },
+                    { id: 3, studentId: 'student@college.edu', title: 'Canteen food quality', description: 'Food quality has deteriorated recently', category: 'Grievance', priority: 'Normal', status: 'Resolved', dateSubmitted: '2025-10-15', anonymous: true, aiConfidence: 'Medium', daysPending: 0, assignedTo: 'Administration' }
+                ];
+                
+                const mockClubs = [
+                    { id: 1, name: 'Coding Club', description: 'Competitive programming and development', memberCount: 234, recentPosts: 12, joined: true },
+                    { id: 2, name: 'Robotics Club', description: 'Robotics and automation projects', memberCount: 156, recentPosts: 8, joined: true },
+                    { id: 3, name: 'Photography Club', description: 'Campus photography and videography', memberCount: 189, recentPosts: 24, joined: false },
+                    { id: 4, name: 'Drama Club', description: 'Theatre and performing arts', memberCount: 98, recentPosts: 6, joined: false },
+                    { id: 5, name: 'AI/ML Club', description: 'Machine learning research and projects', memberCount: 167, recentPosts: 15, joined: true }
+                ];
+                
+                const mockNotices = [
+                    { id: 1, title: 'Mid-term Exam Schedule Released', date: '2025-10-24', priority: 'Urgent', content: 'Mid-term examinations will commence from November 1st' },
+                    { id: 2, title: 'Library Timing Extension', date: '2025-10-23', priority: 'Important', content: 'Library will remain open till 11 PM during exam season' },
+                    { id: 3, title: 'New Course Registration', date: '2025-10-22', priority: 'General', content: 'Elective course registration opens November 5th' }
+                ];
+                
+                const mockFeedback = [
+                    { id: 1, text: 'WiFi connectivity is very poor in library', category: 'Facilities', sentiment: 'Negative', mentions: 23 },
+                    { id: 2, text: 'Need more study spaces during exams', category: 'Facilities', sentiment: 'Negative', mentions: 45 },
+                    { id: 3, text: 'Great faculty support in CSE department', category: 'Academic', sentiment: 'Positive', mentions: 67 },
+                    { id: 4, text: 'Campus events are well organized', category: 'Events', sentiment: 'Positive', mentions: 34 }
+                ];
+                
+                localStorage.setItem('campusEvents', JSON.stringify(mockEvents));
+                localStorage.setItem('campusComplaints', JSON.stringify(mockComplaints));
+                localStorage.setItem('campusClubs', JSON.stringify(mockClubs));
+                localStorage.setItem('campusNotices', JSON.stringify(mockNotices));
+                localStorage.setItem('campusFeedback', JSON.stringify(mockFeedback));
+                localStorage.setItem('campusConnectInitialized', 'true');
+            }
+        };
+        
+        initMockData();
+        
+        // ============================================
+        // REACT APPLICATION
+        // ============================================
+        
+        const { useState, useEffect, useRef, createContext, useContext } = React;
+        
+        // Auth Context
+        const AuthContext = createContext();
+        
+        const AuthProvider = ({ children }) => {
+            const [user, setUser] = useState(null);
+            
+            useEffect(() => {
+                const storedUser = localStorage.getItem('currentUser');
+                if (storedUser) {
+                    setUser(JSON.parse(storedUser));
+                }
+            }, []);
+            
+            const login = (userData) => {
+                setUser(userData);
+                localStorage.setItem('currentUser', JSON.stringify(userData));
+            };
+            
+            const logout = () => {
+                setUser(null);
+                localStorage.removeItem('currentUser');
+            };
+            
+            return React.createElement(AuthContext.Provider, { value: { user, login, logout } }, children);
+        };
+        
+        const useAuth = () => useContext(AuthContext);
+        
+        // Toast Component
+        const Toast = ({ message, type, onClose }) => {
+            useEffect(() => {
+                const timer = setTimeout(onClose, 3000);
+                return () => clearTimeout(timer);
+            }, [onClose]);
+            
+            return React.createElement('div', { 
+                className: `toast toast-${type}`,
+                onClick: onClose
+            }, message);
+        };
+        
+        // Simple Router Implementation
+        const Router = ({ children }) => {
+            const [currentPath, setCurrentPath] = useState(window.location.pathname);
+            
+            useEffect(() => {
+                const handlePopState = () => setCurrentPath(window.location.pathname);
+                window.addEventListener('popstate', handlePopState);
+                return () => window.removeEventListener('popstate', handlePopState);
+            }, []);
+            
+            const navigate = (path) => {
+                window.history.pushState({}, '', path);
+                setCurrentPath(path);
+            };
+            
+            return React.createElement(RouteContext.Provider, { value: { currentPath, navigate } }, children);
+        };
+        
+        const RouteContext = createContext();
+        const useNavigate = () => useContext(RouteContext).navigate;
+        const useLocation = () => useContext(RouteContext).currentPath;
+        
+        const Route = ({ path, component: Component }) => {
+            const { currentPath } = useContext(RouteContext);
+            
+            if (path === currentPath) {
+                return React.createElement(Component);
+            }
+            
+            const pathPattern = path.replace(/:\w+/g, '([^/]+)');
+            const regex = new RegExp(`^${pathPattern}$`);
+            const match = currentPath.match(regex);
+            
+            if (match) {
+                const params = {};
+                const paramNames = (path.match(/:\w+/g) || []).map(p => p.slice(1));
+                paramNames.forEach((name, i) => {
+                    params[name] = match[i + 1];
+                });
+                return React.createElement(Component, { params });
+            }
+            
+            return null;
+        };
+        
+        // ============================================
+        // LANDING PAGE
+        // ============================================
+        
+        const LandingPage = () => {
+            const navigate = useNavigate();
+            
+            useEffect(() => {
+                const cards = document.querySelectorAll('.feature-card');
+                cards.forEach((card, index) => {
+                    setTimeout(() => {
+                        card.classList.add('fade-in');
+                    }, index * 100);
+                });
+            }, []);
+            
+            return React.createElement('div', { className: 'min-h-screen bg-white' },
+                // Header
+                React.createElement('header', { className: 'bg-white shadow-sm sticky top-0 z-40' },
+                    React.createElement('div', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4' },
+                        React.createElement('div', { className: 'flex justify-between items-center' },
+                            React.createElement('div', { className: 'flex items-center space-x-2' },
+                                React.createElement('div', { className: 'w-10 h-10 gradient-blue rounded-lg flex items-center justify-center text-white font-bold text-xl' }, 'CC'),
+                                React.createElement('span', { className: 'text-2xl font-bold text-gray-900' }, 'Campus Connect')
+                            )
+                        )
+                    )
+                ),
+                
+                // Hero Section
+                React.createElement('section', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center fade-in' },
+                    React.createElement('h1', { className: 'text-5xl md:text-6xl font-bold text-gray-900 mb-6' }, 'AI-Powered Campus Management'),
+                    React.createElement('p', { className: 'text-2xl text-gray-600 mb-4' }, 'Smart solutions for efficient campus life'),
+                    React.createElement('p', { className: 'text-lg text-gray-500 max-w-2xl mx-auto' }, 
+                        'Intelligent event recommendations, automated complaint routing, and data-driven insights'
+                    )
+                ),
+                
+                // Feature Cards
+                React.createElement('section', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12' },
+                    React.createElement('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6' },
+                        [
+                            { icon: '🤖', title: 'Smart Event Recommendations', description: 'AI-powered personalized event suggestions based on your interests' },
+                            { icon: '📝', title: 'Intelligent Complaint Routing', description: 'Automated complaint classification and department assignment' },
+                            { icon: '📊', title: 'Feedback Insights', description: 'AI-analyzed feedback to drive campus improvements' },
+                            { icon: '🎓', title: 'Campus Management', description: 'Centralized platform for all campus activities' }
+                        ].map((feature, index) => 
+                            React.createElement('div', { 
+                                key: index,
+                                className: `feature-card card-3d bg-white p-6 rounded-xl shadow-md border border-gray-100 opacity-0 stagger-${index + 1}`
+                            },
+                                React.createElement('div', { className: 'text-5xl mb-4 bounce-in' }, feature.icon),
+                                React.createElement('h3', { className: 'text-xl font-semibold text-gray-900 mb-2' }, feature.title),
+                                React.createElement('p', { className: 'text-gray-600' }, feature.description)
+                            )
+                        )
+                    )
+                ),
+                
+                // CTA Section
+                React.createElement('section', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center fade-in' },
+                    React.createElement('div', { className: 'flex flex-col sm:flex-row gap-4 justify-center items-center' },
+                        React.createElement('button', {
+                            onClick: () => navigate('/login/student'),
+                            className: 'btn-ripple gradient-blue text-white px-8 py-4 rounded-lg text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105'
+                        }, 'Student Login'),
+                        React.createElement('button', {
+                            onClick: () => navigate('/login/faculty'),
+                            className: 'btn-ripple gradient-blue text-white px-8 py-4 rounded-lg text-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105'
+                        }, 'Faculty Login')
+                    )
+                ),
+                
+                // Footer
+                React.createElement('footer', { className: 'bg-gray-50 border-t border-gray-200 mt-20 py-8 fade-in' },
+                    React.createElement('div', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-600' },
+                        React.createElement('p', {}, '© 2025 Campus Connect. All rights reserved.')
+                    )
+                )
+            );
+        };
+        
+        // ============================================
+        // STUDENT LOGIN PAGE
+        // ============================================
+        
+        const StudentLogin = () => {
+            const navigate = useNavigate();
+            const { login } = useAuth();
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+            const [showPassword, setShowPassword] = useState(false);
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+            const [toast, setToast] = useState(null);
+            
+            const handleAutoFill = () => {
+                setEmail('student@college.edu');
+                setPassword('demo123');
+            };
+            
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                setError('');
+                
+                if (!email || !password) {
+                    setError('Please fill in all fields');
+                    return;
+                }
+                
+                setLoading(true);
+                
+                setTimeout(() => {
+                    if (email === 'student@college.edu' && password === 'demo123') {
+                        const userData = {
+                            email,
+                            role: 'student',
+                            name: 'Rahul Kumar',
+                            department: 'Computer Science',
+                            rollNo: 'CS2023001',
+                            attendance: 78,
+                            interests: ['AI', 'Web Development', 'Competitive Programming', 'Hackathons']
+                        };
+                        login(userData);
+                        setToast({ message: 'Login successful!', type: 'success' });
+                        setTimeout(() => navigate('/student/dashboard'), 500);
+                    } else {
+                        setError('Invalid credentials');
+                        setLoading(false);
+                    }
+                }, 1000);
+            };
+            
+            return React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center px-4 fade-in' },
+                toast && React.createElement(Toast, { ...toast, onClose: () => setToast(null) }),
+                
+                React.createElement('div', { className: 'w-full max-w-md' },
+                    // Back Button
+                    React.createElement('button', {
+                        onClick: () => navigate('/'),
+                        className: 'mb-6 flex items-center text-gray-600 hover:text-gray-900 transition'
+                    },
+                        React.createElement('span', { className: 'text-2xl mr-2' }, '←'),
+                        React.createElement('span', {}, 'Back to Home')
+                    ),
+                    
+                    // Login Card
+                    React.createElement('div', { className: 'card-3d bg-white rounded-2xl shadow-xl p-8' },
+                        React.createElement('div', { className: 'text-center mb-8' },
+                            React.createElement('div', { className: 'w-16 h-16 gradient-blue rounded-xl flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4' }, 'CC'),
+                            React.createElement('h2', { className: 'text-3xl font-bold text-gray-900' }, 'Student Login'),
+                            React.createElement('p', { className: 'text-gray-600 mt-2' }, 'Access your campus dashboard')
+                        ),
+                        
+                        // Demo Credentials Badge
+                        React.createElement('div', { className: 'bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6 text-sm' },
+                            React.createElement('p', { className: 'text-blue-900 font-medium mb-1' }, '🔑 Demo Credentials'),
+                            React.createElement('p', { className: 'text-blue-700' }, 'Email: student@college.edu'),
+                            React.createElement('p', { className: 'text-blue-700' }, 'Password: demo123'),
+                            React.createElement('button', {
+                                onClick: handleAutoFill,
+                                className: 'mt-2 text-blue-600 hover:text-blue-800 font-medium'
+                            }, 'Click to auto-fill →')
+                        ),
+                        
+                        // Login Form
+                        React.createElement('form', { onSubmit: handleSubmit },
+                            React.createElement('div', { className: 'mb-4' },
+                                React.createElement('label', { className: 'block text-gray-700 font-medium mb-2' }, 'Email'),
+                                React.createElement('input', {
+                                    type: 'email',
+                                    value: email,
+                                    onChange: (e) => setEmail(e.target.value),
+                                    className: 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition',
+                                    placeholder: 'your.email@college.edu'
+                                })
+                            ),
+                            
+                            React.createElement('div', { className: 'mb-4' },
+                                React.createElement('label', { className: 'block text-gray-700 font-medium mb-2' }, 'Password'),
+                                React.createElement('div', { className: 'relative' },
+                                    React.createElement('input', {
+                                        type: showPassword ? 'text' : 'password',
+                                        value: password,
+                                        onChange: (e) => setPassword(e.target.value),
+                                        className: 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition',
+                                        placeholder: '••••••••'
+                                    }),
+                                    React.createElement('button', {
+                                        type: 'button',
+                                        onClick: () => setShowPassword(!showPassword),
+                                        className: 'absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700'
+                                    }, showPassword ? '👁️' : '👁️‍🗨️')
+                                )
+                            ),
+                            
+                            error && React.createElement('div', { className: 'mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg shake-animate' }, error),
+                            
+                            React.createElement('button', {
+                                type: 'submit',
+                                disabled: loading,
+                                className: 'btn-ripple w-full gradient-blue text-white py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
+                            }, loading ? React.createElement('div', { className: 'spinner' }) : 'Login'),
+                            
+                            React.createElement('div', { className: 'mt-4 text-center' },
+                                React.createElement('a', { href: '#', className: 'text-blue-600 hover:text-blue-800 text-sm' }, 'Forgot Password?')
+                            )
+                        ),
+                        
+                        // OAuth Button (UI mockup)
+                        React.createElement('div', { className: 'mt-6' },
+                            React.createElement('div', { className: 'relative' },
+                                React.createElement('div', { className: 'absolute inset-0 flex items-center' },
+                                    React.createElement('div', { className: 'w-full border-t border-gray-300' })
+                                ),
+                                React.createElement('div', { className: 'relative flex justify-center text-sm' },
+                                    React.createElement('span', { className: 'px-2 bg-white text-gray-500' }, 'Or continue with')
+                                )
+                            ),
+                            React.createElement('button', {
+                                type: 'button',
+                                onClick: handleAutoFill,
+                                className: 'mt-4 w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition'
+                            },
+                                React.createElement('span', { className: 'mr-2' }, '📧'),
+                                React.createElement('span', {}, 'Sign in with College Email')
+                            )
+                        )
+                    )
+                )
+            );
+        };
+        
+        // ============================================
+        // FACULTY LOGIN PAGE
+        // ============================================
+        
+        const FacultyLogin = () => {
+            const navigate = useNavigate();
+            const { login } = useAuth();
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+            const [showPassword, setShowPassword] = useState(false);
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+            const [toast, setToast] = useState(null);
+            
+            const handleAutoFill = () => {
+                setEmail('faculty@college.edu');
+                setPassword('faculty123');
+            };
+            
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                setError('');
+                
+                if (!email || !password) {
+                    setError('Please fill in all fields');
+                    return;
+                }
+                
+                setLoading(true);
+                
+                setTimeout(() => {
+                    if (email === 'faculty@college.edu' && password === 'faculty123') {
+                        const userData = {
+                            email,
+                            role: 'faculty',
+                            name: 'Dr. Priya Sharma',
+                            department: 'Computer Science'
+                        };
+                        login(userData);
+                        setToast({ message: 'Login successful!', type: 'success' });
+                        setTimeout(() => navigate('/faculty/dashboard'), 500);
+                    } else {
+                        setError('Invalid credentials');
+                        setLoading(false);
+                    }
+                }, 1000);
+            };
+            
+            return React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center px-4 fade-in' },
+                toast && React.createElement(Toast, { ...toast, onClose: () => setToast(null) }),
+                
+                React.createElement('div', { className: 'w-full max-w-md' },
+                    React.createElement('button', {
+                        onClick: () => navigate('/'),
+                        className: 'mb-6 flex items-center text-gray-600 hover:text-gray-900 transition'
+                    },
+                        React.createElement('span', { className: 'text-2xl mr-2' }, '←'),
+                        React.createElement('span', {}, 'Back to Home')
+                    ),
+                    
+                    React.createElement('div', { className: 'card-3d bg-white rounded-2xl shadow-xl p-8' },
+                        React.createElement('div', { className: 'text-center mb-8' },
+                            React.createElement('div', { className: 'w-16 h-16 gradient-blue rounded-xl flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4' }, 'CC'),
+                            React.createElement('h2', { className: 'text-3xl font-bold text-gray-900' }, 'Faculty Login'),
+                            React.createElement('p', { className: 'text-gray-600 mt-2' }, 'Access faculty portal')
+                        ),
+                        
+                        React.createElement('div', { className: 'bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6 text-sm' },
+                            React.createElement('p', { className: 'text-blue-900 font-medium mb-1' }, '🔑 Demo Credentials'),
+                            React.createElement('p', { className: 'text-blue-700' }, 'Email: faculty@college.edu'),
+                            React.createElement('p', { className: 'text-blue-700' }, 'Password: faculty123'),
+                            React.createElement('button', {
+                                onClick: handleAutoFill,
+                                className: 'mt-2 text-blue-600 hover:text-blue-800 font-medium'
+                            }, 'Click to auto-fill →')
+                        ),
+                        
+                        React.createElement('form', { onSubmit: handleSubmit },
+                            React.createElement('div', { className: 'mb-4' },
+                                React.createElement('label', { className: 'block text-gray-700 font-medium mb-2' }, 'Email'),
+                                React.createElement('input', {
+                                    type: 'email',
+                                    value: email,
+                                    onChange: (e) => setEmail(e.target.value),
+                                    className: 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition',
+                                    placeholder: 'your.email@college.edu'
+                                })
+                            ),
+                            
+                            React.createElement('div', { className: 'mb-4' },
+                                React.createElement('label', { className: 'block text-gray-700 font-medium mb-2' }, 'Password'),
+                                React.createElement('div', { className: 'relative' },
+                                    React.createElement('input', {
+                                        type: showPassword ? 'text' : 'password',
+                                        value: password,
+                                        onChange: (e) => setPassword(e.target.value),
+                                        className: 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition',
+                                        placeholder: '••••••••'
+                                    }),
+                                    React.createElement('button', {
+                                        type: 'button',
+                                        onClick: () => setShowPassword(!showPassword),
+                                        className: 'absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700'
+                                    }, showPassword ? '👁️' : '👁️‍🗨️')
+                                )
+                            ),
+                            
+                            error && React.createElement('div', { className: 'mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg shake-animate' }, error),
+                            
+                            React.createElement('button', {
+                                type: 'submit',
+                                disabled: loading,
+                                className: 'btn-ripple w-full gradient-blue text-white py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
+                            }, loading ? React.createElement('div', { className: 'spinner' }) : 'Login')
+                        )
+                    )
+                )
+            );
+        };
+        
+        // ============================================
+        // STUDENT DASHBOARD
+        // ============================================
+        
+        const StudentDashboard = () => {
+            const navigate = useNavigate();
+            const { user, logout } = useAuth();
+            const [showProfileMenu, setShowProfileMenu] = useState(false);
+            const [attendanceProgress, setAttendanceProgress] = useState(0);
+            const [eventsCount, setEventsCount] = useState(0);
+            const [issuesCount, setIssuesCount] = useState(0);
+            const [toast, setToast] = useState(null);
+            
+            useEffect(() => {
+                if (!user || user.role !== 'student') {
+                    navigate('/login/student');
+                    return;
+                }
+                
+                // Animate stats
+                setTimeout(() => setAttendanceProgress(78), 300);
+                let count = 0;
+                const eventTimer = setInterval(() => {
+                    if (count < 4) {
+                        count++;
+                        setEventsCount(count);
+                    } else {
+                        clearInterval(eventTimer);
+                    }
+                }, 200);
+                
+                setTimeout(() => setIssuesCount(1), 600);
+            }, [user, navigate]);
+            
+            const getGreeting = () => {
+                const hour = new Date().getHours();
+                if (hour < 12) return 'Good Morning';
+                if (hour < 18) return 'Good Afternoon';
+                return 'Good Evening';
+            };
+            
+            const handleLogout = () => {
+                if (confirm('Are you sure you want to logout?')) {
+                    logout();
+                    setToast({ message: 'Logged out successfully', type: 'success' });
+                    setTimeout(() => navigate('/'), 500);
+                }
+            };
+            
+            const events = JSON.parse(localStorage.getItem('campusEvents') || '[]');
+            const recommendedEvents = events.filter(e => e.matchScore >= 85).slice(0, 5);
+            const notices = JSON.parse(localStorage.getItem('campusNotices') || '[]').slice(0, 3);
+            
+            const todaysClasses = [
+                { name: 'Data Structures', time: '09:00 AM', room: 'CS-301', status: 'past' },
+                { name: 'Algorithm Design', time: '11:00 AM', room: 'CS-302', status: 'current' },
+                { name: 'Database Systems', time: '02:00 PM', room: 'CS-303', status: 'upcoming' },
+                { name: 'Web Development', time: '04:00 PM', room: 'CS-304', status: 'upcoming' }
+            ];
+            
+            return React.createElement('div', { className: 'min-h-screen bg-gray-50 pb-20 md:pb-0' },
+                toast && React.createElement(Toast, { ...toast, onClose: () => setToast(null) }),
+                
+                // Header
+                React.createElement('header', { className: 'bg-white shadow-sm sticky top-0 z-40' },
+                    React.createElement('div', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4' },
+                        React.createElement('div', { className: 'flex justify-between items-center' },
+                            React.createElement('div', { className: 'flex items-center space-x-2' },
+                                React.createElement('div', { className: 'w-10 h-10 gradient-blue rounded-lg flex items-center justify-center text-white font-bold' }, 'CC'),
+                                React.createElement('span', { className: 'text-xl font-bold text-gray-900 hidden sm:block' }, 'Campus Connect')
+                            ),
+                            React.createElement('div', { className: 'flex items-center space-x-4' },
+                                React.createElement('div', { className: 'relative' },
+                                    React.createElement('button', { className: 'text-gray-600 hover:text-gray-900 relative' },
+                                        React.createElement('span', { className: 'text-2xl' }, '🔔'),
+                                        React.createElement('span', { className: 'absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center' }, '3')
+                                    )
+                                ),
+                                React.createElement('div', { className: 'relative' },
+                                    React.createElement('button', {
+                                        onClick: () => setShowProfileMenu(!showProfileMenu),
+                                        className: 'w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-semibold'
+                                    }, user?.name?.charAt(0) || 'R'),
+                                    showProfileMenu && React.createElement('div', { className: 'absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50' },
+                                        React.createElement('button', {
+                                            onClick: () => { setShowProfileMenu(false); navigate('/student/profile'); },
+                                            className: 'block w-full text-left px-4 py-2 hover:bg-gray-100'
+                                        }, '👤 Profile'),
+                                        React.createElement('button', {
+                                            onClick: () => { setShowProfileMenu(false); handleLogout(); },
+                                            className: 'block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600'
+                                        }, '🚪 Logout')
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+                
+                // Main Content
+                React.createElement('main', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8' },
+                    // Greeting
+                    React.createElement('div', { className: 'mb-8 fade-in' },
+                        React.createElement('h1', { className: 'text-3xl font-bold text-gray-900' }, 
+                            `${getGreeting()}, ${user?.name?.split(' ')[0] || 'Student'}! 👋`
+                        ),
+                        React.createElement('p', { className: 'text-gray-600 mt-1' }, 'Here\'s what\'s happening today')
+                    ),
+                    
+                    // Quick Stats
+                    React.createElement('div', { className: 'grid grid-cols-1 md:grid-cols-3 gap-4 mb-8' },
+                        // Attendance
+                        React.createElement('div', { className: 'card-3d bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl shadow-md border-l-4 border-blue-500 slide-up stagger-1' },
+                            React.createElement('div', { className: 'flex justify-between items-start mb-2' },
+                                React.createElement('div', {},
+                                    React.createElement('p', { className: 'text-gray-600 text-sm' }, 'Attendance'),
+                                    React.createElement('p', { className: 'text-3xl font-bold text-gray-900' }, `${attendanceProgress}%`)
+                                ),
+                                React.createElement('span', { className: 'text-3xl' }, '📊')
+                            ),
+                            React.createElement('div', { className: 'w-full bg-gray-200 rounded-full h-2 mt-3' },
+                                React.createElement('div', { 
+                                    className: 'progress-bar bg-blue-500 h-2 rounded-full',
+                                    style: { width: `${attendanceProgress}%` }
+                                })
+                            )
+                        ),
+                        
+                        // Events Joined
+                        React.createElement('div', { className: 'card-3d bg-gradient-to-br from-cyan-50 to-cyan-100 p-6 rounded-xl shadow-md border-l-4 border-cyan-500 slide-up stagger-2' },
+                            React.createElement('div', { className: 'flex justify-between items-start' },
+                                React.createElement('div', {},
+                                    React.createElement('p', { className: 'text-gray-600 text-sm' }, 'Events Joined'),
+                                    React.createElement('p', { className: 'text-3xl font-bold text-gray-900' }, eventsCount)
+                                ),
+                                React.createElement('span', { className: 'text-3xl' }, '📅')
+                            )
+                        ),
+                        
+                        // Pending Issues
+                        React.createElement('div', { className: 'card-3d bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-xl shadow-md border-l-4 border-amber-500 slide-up stagger-3' },
+                            React.createElement('div', { className: 'flex justify-between items-start' },
+                                React.createElement('div', {},
+                                    React.createElement('p', { className: 'text-gray-600 text-sm' }, 'Pending Issues'),
+                                    React.createElement('p', { className: 'text-3xl font-bold text-gray-900' }, issuesCount)
+                                ),
+                                React.createElement('span', { className: 'text-3xl' }, '📝')
+                            )
+                        )
+                    ),
+                    
+                    // AI Recommendations Section
+                    React.createElement('div', { className: 'mb-8' },
+                        React.createElement('div', { className: 'flex justify-between items-center mb-4' },
+                            React.createElement('div', {},
+                                React.createElement('h2', { className: 'text-2xl font-bold text-gray-900' }, '🤖 Recommended For You'),
+                                React.createElement('p', { className: 'text-gray-600 text-sm mt-1' }, 'AI-picked events based on your profile')
+                            ),
+                            React.createElement('button', {
+                                onClick: () => navigate('/student/recommendations'),
+                                className: 'text-blue-600 hover:text-blue-800 font-medium text-sm'
+                            }, 'View All →')
+                        ),
+                        
+                        React.createElement('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4' },
+                            recommendedEvents.map((event, index) => 
+                                React.createElement('div', { 
+                                    key: event.id,
+                                    className: `card-3d bg-white p-5 rounded-xl shadow-md border border-gray-100 slide-in-left stagger-${index + 1}`
+                                },
+                                    React.createElement('div', { className: 'flex justify-between items-start mb-3' },
+                                        React.createElement('span', { className: 'px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium' }, event.category),
+                                        React.createElement('div', { className: 'flex items-center space-x-1' },
+                                            React.createElement('span', { className: 'text-xs' }, '⚡'),
+                                            React.createElement('span', { className: 'text-sm font-bold text-blue-600' }, `${event.matchScore}%`)
+                                        )
+                                    ),
+                                    React.createElement('h3', { className: 'font-bold text-gray-900 mb-2' }, event.title),
+                                    React.createElement('div', { className: 'flex items-center text-gray-600 text-sm mb-2' },
+                                        React.createElement('span', { className: 'mr-2' }, '📅'),
+                                        React.createElement('span', {}, `${event.date} • ${event.time}`)
+                                    ),
+                                    React.createElement('div', { className: 'flex items-center text-gray-600 text-sm mb-3' },
+                                        React.createElement('span', { className: 'mr-2' }, '📍'),
+                                        React.createElement('span', {}, event.location)
+                                    ),
+                                    React.createElement('p', { className: 'text-xs text-gray-500 mb-3' }, 
+                                        `✨ ${event.reason}`
+                                    ),
+                                    React.createElement('button', { 
+                                        className: 'btn-ripple w-full gradient-blue text-white py-2 rounded-lg font-medium hover:shadow-lg transition-all',
+                                        onClick: () => setToast({ message: '✓ Registered for event!', type: 'success' })
+                                    }, 'RSVP')
+                                )
+                            )
+                        )
+                    ),
+                    
+                    // Today's Classes
+                    React.createElement('div', { className: 'mb-8' },
+                        React.createElement('h2', { className: 'text-2xl font-bold text-gray-900 mb-4' }, '📅 Today\'s Classes'),
+                        React.createElement('div', { className: 'bg-white rounded-xl shadow-md p-6' },
+                            todaysClasses.map((cls, index) => 
+                                React.createElement('div', { 
+                                    key: index,
+                                    className: `flex items-center py-3 border-l-4 pl-4 mb-3 ${
+                                        cls.status === 'current' ? 'border-blue-500 bg-blue-50' :
+                                        cls.status === 'past' ? 'border-gray-300 bg-gray-50 opacity-60' :
+                                        'border-green-500'
+                                    }`
+                                },
+                                    React.createElement('div', { className: 'flex-1' },
+                                        React.createElement('p', { 
+                                            className: `font-bold ${cls.status === 'current' ? 'text-blue-900' : 'text-gray-900'}`
+                                        }, cls.name),
+                                        React.createElement('p', { className: 'text-sm text-gray-600' }, `${cls.time} • ${cls.room}`)
+                                    ),
+                                    cls.status === 'current' && React.createElement('span', { className: 'text-xs bg-blue-500 text-white px-3 py-1 rounded-full' }, 'Now')
+                                )
+                            )
+                        )
+                    ),
+                    
+                    // Recent Notices
+                    React.createElement('div', {},
+                        React.createElement('h2', { className: 'text-2xl font-bold text-gray-900 mb-4' }, '🔔 Recent Notices'),
+                        React.createElement('div', { className: 'space-y-3' },
+                            notices.map((notice, index) => 
+                                React.createElement('div', { 
+                                    key: notice.id,
+                                    className: `card-3d bg-white p-4 rounded-xl shadow-md border-l-4 ${
+                                        notice.priority === 'Urgent' ? 'border-red-500' :
+                                        notice.priority === 'Important' ? 'border-amber-500' :
+                                        'border-gray-300'
+                                    } slide-in-left stagger-${index + 1}`
+                                },
+                                    React.createElement('div', { className: 'flex justify-between items-start mb-2' },
+                                        React.createElement('h3', { className: 'font-bold text-gray-900' }, notice.title),
+                                        React.createElement('span', { 
+                                            className: `px-2 py-1 rounded-full text-xs font-medium ${
+                                                notice.priority === 'Urgent' ? 'bg-red-100 text-red-700' :
+                                                notice.priority === 'Important' ? 'bg-amber-100 text-amber-700' :
+                                                'bg-gray-100 text-gray-700'
+                                            }`
+                                        }, notice.priority)
+                                    ),
+                                    React.createElement('p', { className: 'text-sm text-gray-600 mb-2' }, notice.content),
+                                    React.createElement('p', { className: 'text-xs text-gray-500' }, notice.date)
+                                )
+                            )
+                        )
+                    )
+                ),
+                
+                // Bottom Navigation (Mobile)
+                React.createElement('nav', { className: 'bottom-nav' },
+                    React.createElement('div', { className: 'flex justify-around items-center py-3' },
+                        [
+                            { icon: '🏠', label: 'Home', path: '/student/dashboard', active: true },
+                            { icon: '📅', label: 'Events', path: '/student/events' },
+                            { icon: '🎪', label: 'Clubs', path: '/student/clubs' },
+                            { icon: '📝', label: 'Complaints', path: '/student/complaints' },
+                            { icon: '👤', label: 'Profile', path: '/student/profile' }
+                        ].map(item => 
+                            React.createElement('button', {
+                                key: item.path,
+                                onClick: () => navigate(item.path),
+                                className: `flex flex-col items-center space-y-1 ${item.active ? 'text-blue-600' : 'text-gray-600'}`
+                            },
+                                React.createElement('span', { className: 'text-2xl' }, item.icon),
+                                React.createElement('span', { className: 'text-xs' }, item.label)
+                            )
+                        )
+                    )
+                )
+            );
+        };
+        
+        // ============================================
+        // STUDENT EVENTS PAGE
+        // ============================================
+        
+        const StudentEvents = () => {
+            const navigate = useNavigate();
+            const { user } = useAuth();
+            const [filter, setFilter] = useState('All');
+            const [searchQuery, setSearchQuery] = useState('');
+            const [rsvpedEvents, setRsvpedEvents] = useState(new Set());
+            const [toast, setToast] = useState(null);
+            
+            useEffect(() => {
+                if (!user || user.role !== 'student') {
+                    navigate('/login/student');
+                }
+            }, [user, navigate]);
+            
+            const allEvents = JSON.parse(localStorage.getItem('campusEvents') || '[]');
+            const filteredEvents = allEvents.filter(event => {
+                const matchesFilter = filter === 'All' || event.category === filter;
+                const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesFilter && matchesSearch;
+            });
+            
+            const handleRSVP = (eventId) => {
+                setRsvpedEvents(prev => new Set([...prev, eventId]));
+                setToast({ message: '✓ Successfully registered for event!', type: 'success' });
+            };
+            
+            return React.createElement('div', { className: 'min-h-screen bg-gray-50 pb-20 md:pb-0' },
+                toast && React.createElement(Toast, { ...toast, onClose: () => setToast(null) }),
+                
+                // Header
+                React.createElement('header', { className: 'bg-white shadow-sm sticky top-0 z-40' },
+                    React.createElement('div', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4' },
+                        React.createElement('div', { className: 'flex items-center justify-between' },
+                            React.createElement('button', {
+                                onClick: () => navigate(-1),
+                                className: 'text-gray-600 hover:text-gray-900 flex items-center'
+                            },
+                                React.createElement('span', { className: 'text-2xl mr-2' }, '←'),
+                                React.createElement('span', { className: 'font-semibold' }, 'Back')
+                            ),
+                            React.createElement('h1', { className: 'text-xl font-bold text-gray-900' }, 'All Events'),
+                            React.createElement('div', { className: 'w-16' })
+                        )
+                    )
+                ),
+                
+                // Filters
+                React.createElement('div', { className: 'bg-white border-b border-gray-200 sticky top-16 z-30' },
+                    React.createElement('div', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4' },
+                        React.createElement('div', { className: 'flex flex-wrap gap-2 mb-3' },
+                            ['All', 'Cultural', 'Academic', 'Sports', 'Tech'].map(category =>
+                                React.createElement('button', {
+                                    key: category,
+                                    onClick: () => setFilter(category),
+                                    className: `px-4 py-2 rounded-lg font-medium transition-all ${
+                                        filter === category 
+                                            ? 'gradient-blue text-white shadow-md' 
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`
+                                }, category)
+                            )
+                        ),
+                        React.createElement('input', {
+                            type: 'text',
+                            placeholder: 'Search events...',
+                            value: searchQuery,
+                            onChange: (e) => setSearchQuery(e.target.value),
+                            className: 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                        })
+                    )
+                ),
+                
+                // Events Grid
+                React.createElement('main', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8' },
+                    React.createElement('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' },
+                        filteredEvents.map((event, index) => 
+                            React.createElement('div', { 
+                                key: event.id,
+                                className: `card-3d bg-white rounded-xl shadow-md overflow-hidden fade-in stagger-${(index % 3) + 1}`
+                            },
+                                React.createElement('div', { className: 'h-32 gradient-blue flex items-center justify-center text-6xl' }, 
+                                    event.category === 'Tech' ? '💻' :
+                                    event.category === 'Cultural' ? '🎭' :
+                                    event.category === 'Academic' ? '📚' :
+                                    event.category === 'Sports' ? '⚽' : '🎉'
+                                ),
+                                React.createElement('div', { className: 'p-5' },
+                                    React.createElement('div', { className: 'flex justify-between items-start mb-2' },
+                                        React.createElement('span', { className: 'px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium' }, event.category),
+                                        React.createElement('span', { className: 'text-gray-500 text-sm' }, `${event.rsvpCount} RSVPs`)
+                                    ),
+                                    React.createElement('h3', { className: 'text-lg font-bold text-gray-900 mb-2' }, event.title),
+                                    React.createElement('div', { className: 'space-y-1 mb-3' },
+                                        React.createElement('div', { className: 'flex items-center text-gray-600 text-sm' },
+                                            React.createElement('span', { className: 'mr-2' }, '📅'),
+                                            React.createElement('span', {}, `${event.date} • ${event.time}`)
+                                        ),
+                                        React.createElement('div', { className: 'flex items-center text-gray-600 text-sm' },
+                                            React.createElement('span', { className: 'mr-2' }, '📍'),
+                                            React.createElement('span', {}, event.location)
+                                        )
+                                    ),
+                                    React.createElement('p', { className: 'text-sm text-gray-600 mb-4' }, event.description),
+                                    React.createElement('button', {
+                                        onClick: () => handleRSVP(event.id),
+                                        disabled: rsvpedEvents.has(event.id),
+                                        className: `btn-ripple w-full py-2 rounded-lg font-medium transition-all ${
+                                            rsvpedEvents.has(event.id)
+                                                ? 'bg-green-100 text-green-700 cursor-not-allowed'
+                                                : 'gradient-blue text-white hover:shadow-lg'
+                                        }`
+                                    }, rsvpedEvents.has(event.id) ? '✓ Registered' : 'RSVP')
+                                )
+                            )
+                        )
+                    ),
+                    
+                    filteredEvents.length === 0 && React.createElement('div', { className: 'text-center py-12' },
+                        React.createElement('p', { className: 'text-gray-500 text-lg' }, 'No events found')
+                    )
+                ),
+                
+                // Bottom Navigation
+                React.createElement('nav', { className: 'bottom-nav' },
+                    React.createElement('div', { className: 'flex justify-around items-center py-3' },
+                        [
+                            { icon: '🏠', label: 'Home', path: '/student/dashboard' },
+                            { icon: '📅', label: 'Events', path: '/student/events', active: true },
+                            { icon: '🎪', label: 'Clubs', path: '/student/clubs' },
+                            { icon: '📝', label: 'Complaints', path: '/student/complaints' },
+                            { icon: '👤', label: 'Profile', path: '/student/profile' }
+                        ].map(item => 
+                            React.createElement('button', {
+                                key: item.path,
+                                onClick: () => navigate(item.path),
+                                className: `flex flex-col items-center space-y-1 ${item.active ? 'text-blue-600' : 'text-gray-600'}`
+                            },
+                                React.createElement('span', { className: 'text-2xl' }, item.icon),
+                                React.createElement('span', { className: 'text-xs' }, item.label)
+                            )
+                        )
+                    )
+                )
+            );
+        };
+        
+        // ============================================
+        // STUDENT RECOMMENDATIONS PAGE
+        // ============================================
+        
+        const StudentRecommendations = () => {
+            const navigate = useNavigate();
+            const { user } = useAuth();
+            const [toast, setToast] = useState(null);
+            
+            useEffect(() => {
+                if (!user || user.role !== 'student') {
+                    navigate('/login/student');
+                }
+            }, [user, navigate]);
+            
+            const events = JSON.parse(localStorage.getItem('campusEvents') || '[]');
+            const topRecommendations = events.filter(e => e.matchScore >= 85).slice(0, 5);
+            
+            return React.createElement('div', { className: 'min-h-screen bg-gray-50 pb-20' },
+                toast && React.createElement(Toast, { ...toast, onClose: () => setToast(null) }),
+                
+                React.createElement('header', { className: 'bg-white shadow-sm sticky top-0 z-40' },
+                    React.createElement('div', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4' },
+                        React.createElement('div', { className: 'flex items-center justify-between' },
+                            React.createElement('button', {
+                                onClick: () => navigate(-1),
+                                className: 'text-gray-600 hover:text-gray-900 flex items-center'
+                            },
+                                React.createElement('span', { className: 'text-2xl mr-2' }, '←'),
+                                React.createElement('span', { className: 'font-semibold' }, 'Back')
+                            ),
+                            React.createElement('h1', { className: 'text-xl font-bold text-gray-900' }, 'AI Recommendations'),
+                            React.createElement('div', { className: 'w-16' })
+                        )
+                    )
+                ),
+                
+                React.createElement('main', { className: 'max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8' },
+                    // Algorithm Explanation
+                    React.createElement('div', { className: 'bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 mb-8 shadow-md fade-in' },
+                        React.createElement('h2', { className: 'text-2xl font-bold text-gray-900 mb-4' }, '🤖 How AI Picked These For You'),
+                        React.createElement('p', { className: 'text-gray-700 mb-4' }, 'Our AI Analyzed:'),
+                        React.createElement('div', { className: 'space-y-3' },
+                            [
+                                `Your department (${user?.department || 'Computer Science'})`,
+                                'Events you attended (4 events)',
+                                'Clubs you joined (2 clubs)',
+                                'Your interests (AI, Web Development, Hackathons)',
+                                'Students like you (125 similar students)'
+                            ].map((item, index) => 
+                                React.createElement('div', { 
+                                    key: index,
+                                    className: `flex items-center space-x-3 slide-in-left stagger-${index + 1}`
+                                },
+                                    React.createElement('div', { className: 'w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm' }, '✓'),
+                                    React.createElement('span', { className: 'text-gray-800' }, item)
+                                )
+                            )
+                        )
+                    ),
+                    
+                    // Top Recommendations
+                    React.createElement('h2', { className: 'text-2xl font-bold text-gray-900 mb-4' }, 'Top 5 Recommended Events'),
+                    React.createElement('div', { className: 'space-y-4' },
+                        topRecommendations.map((event, index) => 
+                            React.createElement('div', { 
+                                key: event.id,
+                                className: `card-3d bg-white rounded-xl p-6 shadow-md slide-in-left stagger-${index + 1}`
+                            },
+                                React.createElement('div', { className: 'flex justify-between items-start mb-3' },
+                                    React.createElement('h3', { className: 'text-xl font-bold text-gray-900' }, event.title),
+                                    React.createElement('div', { className: 'flex items-center space-x-2 bg-blue-100 px-3 py-1 rounded-full' },
+                                        React.createElement('span', { className: 'text-sm' }, '⚡'),
+                                        React.createElement('span', { className: 'font-bold text-blue-700' }, `${event.matchScore}% Match`)
+                                    )
+                                ),
+                                
+                                React.createElement('div', { className: 'mb-3' },
+                                    React.createElement('div', { className: 'w-full bg-gray-200 rounded-full h-2' },
+                                        React.createElement('div', { 
+                                            className: 'progress-bar bg-gradient-to-r from-blue-500 to-cyan-500 h-2 rounded-full',
+                                            style: { width: `${event.matchScore}%` }
+                                        })
+                                    )
+                                ),
+                                
+                                React.createElement('div', { className: 'space-y-2 mb-4' },
+                                    React.createElement('div', { className: 'flex items-center text-gray-600 text-sm' },
+                                        React.createElement('span', { className: 'mr-2' }, '📅'),
+                                        React.createElement('span', {}, `${event.date} • ${event.time}`)
+                                    ),
+                                    React.createElement('div', { className: 'flex items-center text-gray-600 text-sm' },
+                                        React.createElement('span', { className: 'mr-2' }, '📍'),
+                                        React.createElement('span', {}, event.location)
+                                    ),
+                                    React.createElement('div', { className: 'flex items-start text-gray-700 text-sm' },
+                                        React.createElement('span', { className: 'mr-2' }, '💡'),
+                                        React.createElement('span', {}, `Why recommended: ${event.reason}`)
+                                    ),
+                                    React.createElement('div', { className: 'flex items-center text-gray-600 text-sm' },
+                                        React.createElement('span', { className: 'mr-2' }, '👥'),
+                                        React.createElement('span', {}, `Similar students going: ${Math.floor(event.rsvpCount * 0.15)}`)
+                                    )
+                                ),
+                                
+                                React.createElement('button', {
+                                    onClick: () => setToast({ message: '✓ Registered for event!', type: 'success' }),
+                                    className: 'btn-ripple w-full gradient-blue text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all'
+                                }, 'RSVP for This Event')
+                            )
+                        )
+                    )
+                )
+            );
+        };
+        
+        // Main App Component
+        const App = () => {
+            return React.createElement(AuthProvider, {},
+                React.createElement(Router, {},
+                    React.createElement(Route, { path: '/', component: LandingPage }),
+                    React.createElement(Route, { path: '/login/student', component: StudentLogin }),
+                    React.createElement(Route, { path: '/login/faculty', component: FacultyLogin }),
+                    React.createElement(Route, { path: '/student/dashboard', component: StudentDashboard }),
+                    React.createElement(Route, { path: '/student/events', component: StudentEvents }),
+                    React.createElement(Route, { path: '/student/recommendations', component: StudentRecommendations })
+                )
+            );
+        };
+        
+        // Render
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(App));
+    </script>
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+</body>
+</html>
