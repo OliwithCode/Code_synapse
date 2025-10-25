@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Connect - AI-Powered Campus Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; overflow-x: hidden; }
+        .gradient-bg { background: linear-gradient(135deg, #3B82F6, #06B6D4); }
+        .card-3d { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s; }
+        .card-3d:hover { transform: translateY(-8px) rotateX(5deg); box-shadow: 0 20px 25px rgba(0,0,0,0.15); }
+        .btn-ripple { position: relative; overflow: hidden; }
+        .btn-ripple::after { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; border-radius: 50%; background: rgba(255,255,255,0.5); transform: translate(-50%, -50%); transition: width 0.6s, height 0.6s; }
+        .btn-ripple:active::after { width: 300px; height: 300px; }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .slide-up { animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .stagger-item { opacity: 0; animation: staggerIn 0.4s ease-out forwards; }
+        @keyframes staggerIn { to { opacity: 1; transform: translateX(0); } }
+        .bounce-icon { animation: bounceIcon 0.6s ease-out; }
+        @keyframes bounceIcon { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        .progress-bar { transition: width 1s ease-out; }
+        .count-up { transition: all 1s ease-out; }
+        .toast { position: fixed; top: 20px; right: 20px; z-index: 9999; padding: 16px 24px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); animation: slideInRight 0.3s ease-out; }
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(100px); } to { opacity: 1; transform: translateX(0); } }
+        .toast.success { background: #10B981; color: white; }
+        .toast.error { background: #EF4444; color: white; }
+        .modal-backdrop { background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+        .modal-content { animation: modalSlideUp 0.3s ease-out; }
+        @keyframes modalSlideUp { from { opacity: 0; transform: translateY(100px); } to { opacity: 1; transform: translateY(0); } }
+        .shake { animation: shake 0.3s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        .pulse-alert { animation: pulseAlert 2s infinite; }
+        @keyframes pulseAlert { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000; }
+        .nav-item { transition: all 0.2s; }
+        .nav-item.active { color: #3B82F6; }
+        .nav-item.active::after { content: ''; position: absolute; top: -2px; left: 50%; transform: translateX(-50%); width: 40px; height: 3px; background: #3B82F6; border-radius: 0 0 3px 3px; }
+        input:focus, textarea:focus, select:focus { outline: 2px solid #3B82F6; outline-offset: 2px; }
+        .chart-bar { animation: barGrow 0.8s ease-out forwards; transform-origin: bottom; }
+        @keyframes barGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+        .timeline-line { animation: drawLine 0.8s ease-out forwards; }
+        @keyframes drawLine { from { height: 0; } to { height: 100%; } }
+        .avatar-stack { display: flex; }
+        .avatar-stack img { margin-left: -8px; border: 2px solid white; border-radius: 50%; }
+        .floating-label { position: absolute; top: -8px; left: 12px; background: white; padding: 0 4px; font-size: 12px; color: #6B7280; }
+    </style>
+</head>
+<body class="bg-white text-gray-900">
+    <div id="root"></div>
+    <div id="toast-container"></div>
+
+    <script type="module">
+        // ==================== INITIALIZATION ====================
+        const initMockData = () => {
+            if (!localStorage.getItem('campusConnectInit')) {
+                const mockEvents = [
+                    { id: 1, title: 'AI & ML Workshop', date: '2025-10-28', time: '10:00 AM', location: 'CS Lab 201', category: 'Tech', dept: 'Computer Science', description: 'Hands-on workshop on AI/ML basics', rsvpCount: 45, matchScore: 95, reason: 'Matches your Tech interests' },
+                    { id: 2, title: 'Annual Hackathon 2025', date: '2025-11-02', time: '9:00 AM', location: 'Main Auditorium', category: 'Tech', dept: 'All', description: '24-hour coding marathon', rsvpCount: 120, matchScore: 92, reason: 'Similar students from CS attending' },
+                    { id: 3, title: 'Cultural Night', date: '2025-10-30', time: '6:00 PM', location: 'Open Ground', category: 'Cultural', dept: 'All', description: 'Annual cultural fest', rsvpCount: 300, matchScore: 78, reason: 'Popular in your department' },
+                    { id: 4, title: 'Guest Lecture: Blockchain', date: '2025-11-05', time: '2:00 PM', location: 'Seminar Hall', category: 'Academic', dept: 'Computer Science', description: 'Industry expert talk', rsvpCount: 80, matchScore: 89, reason: 'Aligns with your interests' },
+                    { id: 5, title: 'Basketball Tournament', date: '2025-11-08', time: '4:00 PM', location: 'Sports Complex', category: 'Sports', dept: 'All', description: 'Inter-department tournament', rsvpCount: 60, matchScore: 65, reason: 'Students like you attended' },
+                    { id: 6, title: 'Photography Exhibition', date: '2025-11-10', time: '11:00 AM', location: 'Art Gallery', category: 'Cultural', dept: 'All', description: 'Student photography showcase', rsvpCount: 35, matchScore: 72, reason: 'Trending in campus' },
+                    { id: 7, title: 'Startup Pitch Competition', date: '2025-11-12', time: '10:00 AM', location: 'Innovation Hub', category: 'Tech', dept: 'All', description: 'Pitch your startup ideas', rsvpCount: 55, matchScore: 88, reason: 'Matches your Innovation interest' },
+                    { id: 8, title: 'Yoga & Wellness Session', date: '2025-11-15', time: '7:00 AM', location: 'Yoga Center', category: 'Sports', dept: 'All', description: 'Morning wellness program', rsvpCount: 40, matchScore: 60, reason: 'Popular among students' }
+                ];
+
+                const mockComplaints = [
+                    { id: 1, studentId: 1, title: 'WiFi Not Working in Hostel Block A', description: 'Internet connectivity has been down for 3 days', category: 'Facilities', priority: 'High', status: 'In Progress', dateSubmitted: '2025-10-20', anonymous: false, confidence: 'High', daysPending: 5, response: 'IT team is working on it' },
+                    { id: 2, studentId: 1, title: 'Classroom AC Not Functional', description: 'Room 305 AC broken', category: 'Facilities', priority: 'Normal', status: 'Open', dateSubmitted: '2025-10-22', anonymous: false, confidence: 'High', daysPending: 3, response: null },
+                    { id: 3, studentId: 2, title: 'Library Books Missing', description: 'Several reference books unavailable', category: 'Academic', priority: 'Normal', status: 'Resolved', dateSubmitted: '2025-10-15', anonymous: true, confidence: 'Medium', daysPending: 0, response: 'Books restocked' },
+                    { id: 4, studentId: 1, title: 'Canteen Food Quality Issue', description: 'Food hygiene concerns', category: 'Hostel', priority: 'Urgent', status: 'Open', dateSubmitted: '2025-10-24', anonymous: false, confidence: 'High', daysPending: 1, response: null }
+                ];
+
+                const mockFeedback = [
+                    { id: 1, studentId: 1, text: 'WiFi quality needs improvement urgently', category: 'Facilities', sentiment: 'Negative', dateSubmitted: '2025-10-20' },
+                    { id: 2, studentId: 2, text: 'Love the new study spaces in library', category: 'Facilities', sentiment: 'Positive', dateSubmitted: '2025-10-21' },
+                    { id: 3, studentId: 3, text: 'More technical workshops needed', category: 'Academic', sentiment: 'Neutral', dateSubmitted: '2025-10-22' },
+                    { id: 4, studentId: 4, text: 'Canteen food quality has declined', category: 'Hostel', sentiment: 'Negative', dateSubmitted: '2025-10-23' }
+                ];
+
+                const mockClubs = [
+                    { id: 1, name: 'Coding Club', description: 'Programming and competitive coding', members: 85, joined: true },
+                    { id: 2, name: 'AI/ML Club', description: 'Artificial Intelligence enthusiasts', members: 62, joined: true },
+                    { id: 3, name: 'Photography Club', description: 'Capture campus moments', members: 45, joined: false },
+                    { id: 4, name: 'Robotics Club', description: 'Build and innovate', members: 38, joined: false }
+                ];
+
+                localStorage.setItem('mockEvents', JSON.stringify(mockEvents));
+                localStorage.setItem('mockComplaints', JSON.stringify(mockComplaints));
+                localStorage.setItem('mockFeedback', JSON.stringify(mockFeedback));
+                localStorage.setItem('mockClubs', JSON.stringify(mockClubs));
+                localStorage.setItem('campusConnectInit', 'true');
+            }
+        };
+
+        // ==================== UTILITIES ====================
+        const showToast = (message, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span>${type === 'success' ? '✓' : '✗'}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        };
+
+        const getTimeGreeting = () => {
+            const hour = new Date().getHours();
+            if (hour < 12) return 'Good Morning';
+            if (hour < 17) return 'Good Afternoon';
+            return 'Good Evening';
+        };
+
+        const countUp = (element, end, duration = 1000) => {
+            let start = 0;
+            const increment = end / (duration / 16);
+            const timer = setInterval(() => {
+                start += increment;
+                if (start >= end) {
+                    element.textContent = Math.round(end);
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.round(start);
+                }
+            }, 16);
+        };
+
+        // ==================== ROUTER ====================
+        class Router {
+            constructor() {
+                this.routes = {};
+                this.currentPath = '/';
+                window.addEventListener('popstate', () => this.loadRoute());
+            }
+
+            addRoute(path, component) {
+                this.routes[path] = component;
+            }
+
+            navigate(path) {
+                window.history.pushState({}, '', path);
+                this.loadRoute();
+            }
+
+            goBack() {
+                window.history.back();
+            }
+
+            loadRoute() {
+                const path = window.location.pathname;
+                this.currentPath = path;
+                
+                // Match dynamic routes
+                let component = this.routes[path];
+                if (!component) {
+                    for (let route in this.routes) {
+                        if (route.includes(':')) {
+                            const pattern = route.replace(/:[^/]+/g, '([^/]+)');
+                            const regex = new RegExp(`^${pattern}$`);
+                            if (regex.test(path)) {
+                                component = this.routes[route];
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (component) {
+                    document.getElementById('root').innerHTML = component();
+                    window.scrollTo(0, 0);
+                } else {
+                    document.getElementById('root').innerHTML = NotFoundPage();
+                }
+            }
+        }
+
+        const router = new Router();
+
+        // ==================== AUTHENTICATION ====================
+        const checkAuth = (requiredRole = null) => {
+            const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (!user) return false;
+            if (requiredRole && user.role !== requiredRole) return false;
+            return true;
+        };
+
+        const logout = () => {
+            localStorage.removeItem('currentUser');
+            showToast('Logged out successfully');
+            router.navigate('/');
+        };
+
+        // ==================== COMPONENTS ====================
+        const Header = (title, showBack = true, showProfile = true) => `
+            <header class="bg-white shadow-md sticky top-0 z-50">
+                <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        ${showBack ? `
+                            <button onclick="router.goBack()" class="p-2 hover:bg-gray-100 rounded-lg transition" title="Go back">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+                        ` : ''}
+                        <h1 class="text-xl font-bold text-gray-900">${title}</h1>
+                    </div>
+                    ${showProfile ? `
+                        <div class="flex items-center gap-4">
+                            <button class="relative p-2 hover:bg-gray-100 rounded-lg transition" onclick="alert('Notifications feature')">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                </svg>
+                                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                            </button>
+                            <div class="relative">
+                                <button onclick="toggleProfileMenu()" class="w-10 h-10 rounded-full gradient-bg text-white flex items-center justify-center font-bold">
+                                    ${JSON.parse(localStorage.getItem('currentUser') || '{}').name?.[0] || 'U'}
+                                </button>
+                                <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2">
+                                    <a href="#" onclick="router.navigate('/${JSON.parse(localStorage.getItem('currentUser') || '{}').role}/profile'); toggleProfileMenu(); return false;" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
+                                    <button onclick="logout(); toggleProfileMenu();" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600">Logout</button>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            </header>
+        `;
+
+        window.toggleProfileMenu = () => {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.toggle('hidden');
+        };
+
+        const BottomNav = (active = 'home', role = 'student') => {
+            const navItems = role === 'student' ? [
+                { name: 'Home', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', path: '/student/dashboard' },
+                { name: 'Events', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', path: '/student/events' },
+                { name: 'Clubs', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', path: '/student/clubs' },
+                { name: 'Complaints', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', path: '/student/complaints' },
+                { name: 'Profile', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', path: '/student/profile' }
+            ] : [
+                { name: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', path: '/faculty/dashboard' },
+                { name: 'Complaints', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', path: '/faculty/complaints' },
+                { name: 'Analytics', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', path: '/faculty/analytics' },
+                { name: 'Settings', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', path: '/faculty/settings' }
+            ];
+
+            return `
+                <nav class="bottom-nav md:hidden">
+                    <div class="flex justify-around items-center py-2">
+                        ${navItems.map(item => `
+                            <button onclick="router.navigate('${item.path}')" class="nav-item relative flex flex-col items-center gap-1 px-4 py-2 ${active === item.name.toLowerCase() ? 'active' : 'text-gray-600'}">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${item.icon}"/>
+                                </svg>
+                                <span class="text-xs">${item.name}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </nav>
+            `;
+        };
+
+        // ==================== PAGES ====================
+        const LandingPage = () => `
+            <div class="min-h-screen fade-in">
+                <header class="bg-white shadow-sm">
+                    <div class="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center text-white font-bold">CC</div>
+                            <span class="text-2xl font-bold text-gray-900">Campus Connect</span>
+                        </div>
+                    </div>
+                </header>
+
+                <section class="max-w-7xl mx-auto px-4 py-16 text-center">
+                    <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6 slide-up">AI-Powered Campus Management</h1>
+                    <p class="text-xl text-gray-600 mb-4 slide-up" style="animation-delay: 0.1s">Smart solutions for efficient campus life</p>
+                    <p class="text-lg text-gray-500 mb-12 slide-up" style="animation-delay: 0.2s">Intelligent event recommendations, automated complaint routing, and data-driven insights</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                        ${[
+                            { icon: '🤖', title: 'Smart Event Recommendations', desc: 'AI-powered personalized event suggestions based on your interests', delay: 0 },
+                            { icon: '📝', title: 'Intelligent Complaint Routing', desc: 'Automated complaint classification and department assignment', delay: 0.05 },
+                            { icon: '📊', title: 'Feedback Insights', desc: 'AI-analyzed feedback to drive campus improvements', delay: 0.1 },
+                            { icon: '🎓', title: 'Campus Management', desc: 'Centralized platform for all campus activities', delay: 0.15 }
+                        ].map((feature, i) => `
+                            <div class="card-3d bg-white p-6 rounded-xl shadow-md stagger-item" style="transform: translateX(-20px); animation-delay: ${feature.delay}s">
+                                <div class="text-5xl mb-4 bounce-icon" style="animation-delay: ${feature.delay + 0.2}s">${feature.icon}</div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">${feature.title}</h3>
+                                <p class="text-gray-600">${feature.desc}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button onclick="router.navigate('/login/student')" class="gradient-bg text-white px-8 py-4 rounded-lg font-bold text-lg btn-ripple hover:scale-105 transition shadow-lg">
+                            Student Login
+                        </button>
+                        <button onclick="router.navigate('/login/faculty')" class="gradient-bg text-white px-8 py-4 rounded-lg font-bold text-lg btn-ripple hover:scale-105 transition shadow-lg">
+                            Faculty Login
+                        </button>
+                    </div>
+                </section>
+
+                <footer class="bg-gray-50 py-8 mt-16">
+                    <div class="max-w-7xl mx-auto px-4 text-center text-gray-600">
+                        <p>&copy; 2025 Campus Connect. All rights reserved.</p>
+                    </div>
+                </footer>
+            </div>
+        `;
+
+        const StudentLoginPage = () => `
+            <div class="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center p-4 fade-in">
+                <div class="w-full max-w-md">
+                    <div class="mb-8">
+                        <button onclick="router.navigate('/')" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            <span>Back to Home</span>
+                        </button>
+                    </div>
+
+                    <div class="card-3d bg-white rounded-2xl shadow-xl p-8 slide-up">
+                        <div class="text-center mb-8">
+                            <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">S</div>
+                            <h2 class="text-3xl font-bold text-gray-900 mb-2">Student Login</h2>
+                            <p class="text-gray-600">Welcome back to Campus Connect</p>
+                        </div>
+
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6">
+                            <p class="text-sm text-blue-800">
+                                <strong>Demo Credentials:</strong><br>
+                                Email: student@college.edu<br>
+                                Password: demo123
+                            </p>
+                        </div>
+
+                        <form onsubmit="handleStudentLogin(event)" id="studentLoginForm">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" id="studentEmail" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition" placeholder="student@college.edu" required>
+                            </div>
+
+                            <div class="mb-4 relative">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                                <input type="password" id="studentPassword" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition" placeholder="Enter password" required>
+                                <button type="button" onclick="togglePassword('studentPassword')" class="absolute right-3 top-10 text-gray-500 hover:text-gray-700">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div class="flex items-center justify-between mb-6">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2 rounded">
+                                    <span class="text-sm text-gray-600">Remember me</span>
+                                </label>
+                                <a href="#" class="text-sm text-blue-600 hover:text-blue-800">Forgot Password?</a>
+                            </div>
+
+                            <button type="submit" class="w-full gradient-bg text-white py-3 rounded-lg font-bold text-lg btn-ripple hover:scale-105 transition shadow-lg mb-4">
+                                Login
+                            </button>
+
+                            <button type="button" onclick="autoFillStudent()" class="w-full bg-white border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                                </svg>
+                                Sign in with Google
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const FacultyLoginPage = () => `
+            <div class="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 flex items-center justify-center p-4 fade-in">
+                <div class="w-full max-w-md">
+                    <div class="mb-8">
+                        <button onclick="router.navigate('/')" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            <span>Back to Home</span>
+                        </button>
+                    </div>
+
+                    <div class="card-3d bg-white rounded-2xl shadow-xl p-8 slide-up">
+                        <div class="text-center mb-8">
+                            <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">F</div>
+                            <h2 class="text-3xl font-bold text-gray-900 mb-2">Faculty Login</h2>
+                            <p class="text-gray-600">Faculty Portal Access</p>
+                        </div>
+
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6">
+                            <p class="text-sm text-blue-800">
+                                <strong>Demo Credentials:</strong><br>
+                                Email: faculty@college.edu<br>
+                                Password: faculty123
+                            </p>
+                        </div>
+
+                        <form onsubmit="handleFacultyLogin(event)" id="facultyLoginForm">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" id="facultyEmail" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition" placeholder="faculty@college.edu" required>
+                            </div>
+
+                            <div class="mb-4 relative">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                                <input type="password" id="facultyPassword" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition" placeholder="Enter password" required>
+                                <button type="button" onclick="togglePassword('facultyPassword')" class="absolute right-3 top-10 text-gray-500 hover:text-gray-700">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div class="flex items-center justify-between mb-6">
+                                <label class="flex items-center">
+                                    <input type="checkbox" class="mr-2 rounded">
+                                    <span class="text-sm text-gray-600">Remember me</span>
+                                </label>
+                                <a href="#" class="text-sm text-blue-600 hover:text-blue-800">Forgot Password?</a>
+                            </div>
+
+                            <button type="submit" class="w-full gradient-bg text-white py-3 rounded-lg font-bold text-lg btn-ripple hover:scale-105 transition shadow-lg mb-4">
+                                Login
+                            </button>
+
+                            <button type="button" onclick="autoFillFaculty()" class="w-full bg-white border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                                </svg>
+                                Sign in with Google
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const StudentDashboard = () => {
+            if (!checkAuth('student')) {
+                router.navigate('/login/student');
+                return '';
+            }
+
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const events = JSON.parse(localStorage.getItem('mockEvents') || '[]');
+            const recommendedEvents = events.filter(e => e.matchScore >= 85).slice(0, 3);
+
+            setTimeout(() => {
+                const attendanceEl = document.getElementById('attendanceCount');
+                const eventsEl = document.getElementById('eventsCount');
+                const issuesEl = document.getElementById('issuesCount');
+                if (attendanceEl) countUp(attendanceEl, 78);
+                if (eventsEl) countUp(eventsEl, 4);
+                if (issuesEl) countUp(issuesEl, 1);
+
+                const progressBar = document.getElementById('attendanceProgress');
+                if (progressBar) {
+                    setTimeout(() => progressBar.style.width = '78%', 100);
+                }
+            }, 300);
+
+            return `
+                <div class="min-h-screen bg-gray-50 pb-20 md:pb-0 fade-in">
+                    ${Header('Campus Connect', false, true)}
+
+                    <div class="max-w-7xl mx-auto px-4 py-6">
+                        <div class="mb-8 slide-up">
+                            <h1 class="text-3xl font-bold text-gray-900 mb-2">${getTimeGreeting()}, ${user.name}! 👋</h1>
+                            <p class="text-gray-600">Ready to explore campus today?</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div class="card-3d bg-blue-50 p-6 rounded-xl shadow-md slide-up" style="animation-delay: 0.1s">
+                                <h3 class="text-sm font-medium text-gray-600 mb-2">Attendance</h3>
+                                <div class="flex items-end gap-2 mb-3">
+                                    <span id="attendanceCount" class="text-3xl font-bold text-blue-600">0</span>
+                                    <span class="text-lg text-gray-600">%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div id="attendanceProgress" class="gradient-bg h-2 rounded-full progress-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="card-3d bg-cyan-50 p-6 rounded-xl shadow-md slide-up" style="animation-delay: 0.2s">
+                                <h3 class="text-sm font-medium text-gray-600 mb-2">Events Joined</h3>
+                                <div class="flex items-end gap-2">
+                                    <span id="eventsCount" class="text-3xl font-bold text-cyan-600">0</span>
+                                    <span class="text-lg text-gray-600">events</span>
+                                </div>
+                            </div>
+
+                            <div class="card-3d bg-amber-50 p-6 rounded-xl shadow-md slide-up" style="animation-delay: 0.3s">
+                                <h3 class="text-sm font-medium text-gray-600 mb-2">Pending Issues</h3>
+                                <div class="flex items-end gap-2">
+                                    <span id="issuesCount" class="text-3xl font-bold text-amber-600">0</span>
+                                    <span class="text-lg text-gray-600">complaints</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-8">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h2 class="text-2xl font-bold text-gray-900 mb-1">🤖 Recommended For You</h2>
+                                    <p class="text-gray-600">AI-picked events based on your profile</p>
+                                </div>
+                                <button onclick="router.navigate('/student/recommendations')" class="text-blue-600 hover:text-blue-800 font-medium">View All →</button>
+                            </div>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                ${recommendedEvents.map((event, i) => `
+                                    <div class="card-3d bg-white p-6 rounded-xl shadow-md stagger-item" style="transform: translateX(-20px); animation-delay: ${i * 0.05}s">
+                                        <div class="flex items-start justify-between mb-3">
+                                            <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">${event.category}</span>
+                                            <div class="flex items-center gap-1 text-green-600">
+                                                <span class="text-xs font-bold">⚡ ${event.matchScore}%</span>
+                                            </div>
+                                        </div>
+                                        <h3 class="text-lg font-bold text-gray-900 mb-2">${event.title}</h3>
+                                        <div class="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                            </svg>
+                                            <span>${event.date} at ${event.time}</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-sm text-gray-600 mb-3">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                            <span>${event.location}</span>
+                                        </div>
+                                        <p class="text-sm text-gray-500 mb-4">💡 ${event.reason}</p>
+                                        <button onclick="rsvpEvent(${event.id}, this)" class="w-full gradient-bg text-white py-2 rounded-lg font-medium btn-ripple hover:scale-105 transition">
+                                            RSVP Now
+                                        </button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-900 mb-4">📅 Today's Classes</h2>
+                                <div class="bg-white rounded-xl shadow-md p-6">
+                                    ${[
+                                        { name: 'Data Structures', time: '9:00 AM - 10:00 AM', room: 'CS-201', status: 'past' },
+                                        { name: 'Operating Systems', time: '10:15 AM - 11:15 AM', room: 'CS-203', status: 'current' },
+                                        { name: 'DBMS Lab', time: '2:00 PM - 4:00 PM', room: 'Lab-1', status: 'upcoming' }
+                                    ].map((cls, i) => `
+                                        <div class="flex items-start gap-4 pb-4 ${i < 2 ? 'mb-4 border-b border-gray-200' : ''}">
+                                            <div class="flex-shrink-0 w-1 h-16 ${cls.status === 'current' ? 'bg-blue-500' : 'bg-gray-300'} rounded-full"></div>
+                                            <div class="flex-1">
+                                                <h4 class="font-bold ${cls.status === 'current' ? 'text-blue-600' : cls.status === 'past' ? 'text-gray-400' : 'text-gray-900'}">${cls.name}</h4>
+                                                <p class="text-sm text-gray-600">${cls.time}</p>
+                                                <p class="text-sm text-gray-500">${cls.room}</p>
+                                                ${cls.status === 'current' ? '<span class="text-xs font-medium text-blue-600">● In Progress</span>' : ''}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-900 mb-4">🔔 Recent Notices</h2>
+                                <div class="space-y-4">
+                                    ${[
+                                        { title: 'Mid-term Exam Schedule', date: 'Oct 24', priority: 'Urgent', color: 'red' },
+                                        { title: 'Library Hours Extended', date: 'Oct 23', priority: 'Important', color: 'amber' },
+                                        { title: 'Career Fair Registration', date: 'Oct 22', priority: 'General', color: 'gray' }
+                                    ].map(notice => `
+                                        <div class="card-3d bg-white p-4 rounded-xl shadow-md border-l-4 border-${notice.color}-500">
+                                            <div class="flex items-start justify-between">
+                                                <div>
+                                                    <h4 class="font-bold text-gray-900 mb-1">${notice.title}</h4>
+                                                    <p class="text-sm text-gray-600">${notice.date}</p>
+                                                </div>
+                                                <span class="px-2 py-1 bg-${notice.color}-100 text-${notice.color}-800 text-xs font-medium rounded">${notice.priority}</span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${BottomNav('home', 'student')}
+                </div>
+            `;
+        };
+
+        const StudentEventsPage = () => {
+            if (!checkAuth('student')) {
+                router.navigate('/login/student');
+                return '';
+            }
+
+            const events = JSON.parse(localStorage.getItem('mockEvents') || '[]');
+
+            return `
+                <div class="min-h-screen bg-gray-50 pb-20 md:pb-0 fade-in">
+                    ${Header('All Events', true, true)}
+
+                    <div class="max-w-7xl mx-auto px-4 py-6">
+                        <div class="bg-white rounded-xl shadow-md p-4 mb-6 sticky top-20 z-40">
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                ${['All', 'Cultural', 'Academic', 'Sports', 'Tech'].map(cat => `
+                                    <button onclick="filterEvents('${cat}')" class="px-4 py-2 bg-gray-100 hover:bg-blue-500 hover:text-white rounded-lg transition font-medium text-sm">
+                                        ${cat}
+                                    </button>
+                                `).join('')}
+                            </div>
+                            <input type="text" placeholder="Search events..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${events.map((event, i) => `
+                                <div class="card-3d bg-white rounded-xl shadow-md overflow-hidden stagger-item" style="transform: translateX(-20px); animation-delay: ${i * 0.03}s">
+                                    <div class="h-32 gradient-bg flex items-center justify-center text-white text-4xl">
+                                        ${event.category === 'Tech' ? '💻' : event.category === 'Cultural' ? '🎭' : event.category === 'Sports' ? '⚽' : '📚'}
+                                    </div>
+                                    <div class="p-6">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">${event.category}</span>
+                                            <span class="text-sm text-gray-600">${event.rsvpCount} RSVPs</span>
+                                        </div>
+                                        <h3 class="text-lg font-bold text-gray-900 mb-2">${event.title}</h3>
+                                        <div class="space-y-2 mb-4">
+                                            <div class="flex items-center gap-2 text-sm text-gray-600">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                </svg>
+                                                <span>${event.date} at ${event.time}</span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-sm text-gray-600">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                </svg>
+                                                <span>${event.location}</span>
+                                            </div>
+                                        </div>
+                                        <button onclick="rsvpEvent(${event.id}, this)" class="w-full gradient-bg text-white py-2 rounded-lg font-medium btn-ripple hover:scale-105 transition">
+                                            RSVP
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    ${BottomNav('events', 'student')}
+                </div>
+            `;
+        };
+
+        const StudentComplaintsPage = () => {
+            if (!checkAuth('student')) {
+                router.navigate('/login/student');
+                return '';
+            }
+
+            const complaints = JSON.parse(localStorage.getItem('mockComplaints') || '[]');
+            const userComplaints = complaints.filter(c => c.studentId === 1);
+
+            return `
+                <div class="min-h-screen bg-gray-50 pb-20 md:pb-0 fade-in">
+                    ${Header('My Complaints', true, true)}
+
+                    <div class="max-w-7xl mx-auto px-4 py-6">
+                        <div class="space-y-4">
+                            ${userComplaints.map((complaint, i) => `
+                                <div class="card-3d bg-white rounded-xl shadow-md p-6 border-l-4 ${complaint.status === 'Open' ? 'border-red-500' : complaint.status === 'In Progress' ? 'border-amber-500' : 'border-green-500'} stagger-item" style="transform: translateX(-20px); animation-delay: ${i * 0.05}s">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <h3 class="text-lg font-bold text-gray-900 flex-1">${complaint.title}</h3>
+                                        <span class="px-3 py-1 ${complaint.status === 'Open' ? 'bg-red-100 text-red-800' : complaint.status === 'In Progress' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'} text-xs font-medium rounded-full ml-4">
+                                            ${complaint.status === 'Open' ? '⭕' : complaint.status === 'In Progress' ? '⏳' : '✅'} ${complaint.status}
+                                        </span>
+                                    </div>
+                                    <p class="text-gray-600 mb-3">${complaint.description}</p>
+                                    <div class="flex items-center gap-4 text-sm text-gray-500">
+                                        <span class="px-2 py-1 bg-gray-100 rounded">${complaint.category}</span>
+                                        <span>Priority: ${complaint.priority}</span>
+                                        <span>Submitted: ${complaint.dateSubmitted}</span>
+                                        <span class="font-medium">${complaint.daysPending} days pending</span>
+                                    </div>
+                                    ${complaint.response ? `
+                                        <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+                                            <p class="text-sm font-medium text-gray-700 mb-1">Admin Response:</p>
+                                            <p class="text-sm text-gray-600">${complaint.response}</p>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <button onclick="openNewComplaintModal()" class="fixed bottom-24 md:bottom-8 right-8 gradient-bg text-white px-6 py-4 rounded-full shadow-lg hover:scale-110 transition font-bold flex items-center gap-2 z-50">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        New Complaint
+                    </button>
+
+                    ${BottomNav('complaints', 'student')}
+
+                    <div id="complaintModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+                        <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full modal-content max-h-[90vh] overflow-y-auto">
+                            <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+                                <h3 class="text-2xl font-bold text-gray-900">File a New Complaint</h3>
+                                <button onclick="closeComplaintModal()" class="p-2 hover:bg-gray-100 rounded-lg">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <form onsubmit="handleNewComplaint(event)" class="p-6">
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Title *</label>
+                                    <input type="text" id="complaintTitle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                                    <textarea id="complaintDescription" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required></textarea>
+                                    <div id="aiSuggestions" class="mt-2 text-sm text-gray-600"></div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                                    <select id="complaintCategory" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                        <option value="Hostel">Hostel</option>
+                                        <option value="Academic">Academic</option>
+                                        <option value="Facilities">Facilities</option>
+                                        <option value="Grievance">Grievance</option>
+                                    </select>
+                                </div>
+                                <div class="mb-6">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="complaintAnonymous" class="mr-2 rounded">
+                                        <span class="text-sm text-gray-700">Submit anonymously</span>
+                                    </label>
+                                </div>
+                                <div class="flex gap-4">
+                                    <button type="button" onclick="closeComplaintModal()" class="flex-1 px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="flex-1 gradient-bg text-white px-6 py-3 rounded-lg font-bold btn-ripple hover:scale-105 transition">
+                                        Submit
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        const StudentClubsPage = () => {
+            if (!checkAuth('student')) {
+                router.navigate('/login/student');
+                return '';
+            }
+
+            const clubs = JSON.parse(localStorage.getItem('mockClubs') || '[]');
+
+            return `
+                <div class="min-h-screen bg-gray-50 pb-20 md:pb-0 fade-in">
+                    ${Header('Campus Clubs', true, true)}
+
+                    <div class="max-w-7xl mx-auto px-4 py-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${clubs.map((club, i) => `
+                                <div class="card-3d bg-white rounded-xl shadow-md p-6 stagger-item" style="transform: translateX(-20px); animation-delay: ${i * 0.05}s">
+                                    <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                                        ${club.name[0]}
+                                    </div>
+                                    <h3 class="text-xl font-bold text-gray-900 text-center mb-2">${club.name}</h3>
+                                    <p class="text-gray-600 text-center mb-4">${club.description}</p>
+                                    <div class="flex items-center justify-center gap-2 mb-4 text-gray-600">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                        </svg>
+                                        <span class="font-medium">${club.members} members</span>
+                                    </div>
+                                    <button onclick="toggleClubMembership(${club.id}, this)" class="${club.joined ? 'bg-gray-200 text-gray-700' : 'gradient-bg text-white'} w-full py-3 rounded-lg font-bold btn-ripple hover:scale-105 transition">
+                                        ${club.joined ? '✓ Joined' : 'Join Club'}
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    ${BottomNav('clubs', 'student')}
+                </div>
+            `;
+        };
+
+        const StudentProfilePage = () => {
+            if (!checkAuth('student')) {
+                router.navigate('/login/student');
+                return '';
+            }
+
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+
+            return `
+                <div class="min-h-screen bg-gray-50 pb-20 md:pb-0 fade-in">
+                    ${Header('My Profile', true, true)}
+
+                    <div class="max-w-4xl mx-auto px-4 py-6">
+                        <div class="bg-white rounded-xl shadow-md p-8 mb-6 text-center slide-up">
+                            <div class="w-32 h-32 gradient-bg rounded-full flex items-center justify-center text-white text-5xl font-bold mx-auto mb-4 shadow-lg">
+                                ${user.name[0]}
+                            </div>
+                            <h2 class="text-3xl font-bold text-gray-900 mb-2">${user.name}</h2>
+                            <p class="text-gray-600 mb-1">Roll: 2023CS001</p>
+                            <p class="text-gray-600 mb-4">${user.department}</p>
+                            <button class="px-6 py-2 border-2 border-blue-500 text-blue-500 rounded-lg font-medium hover:bg-blue-50 transition">
+                                Edit Profile
+                            </button>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                            <h3 class="text-xl font-bold text-gray-900 mb-4">Interests</h3>
+                            <div class="flex flex-wrap gap-2">
+                                ${['AI', 'Web Development', 'Competitive Programming', 'Hackathons', 'Innovation'].map(interest => `
+                                    <span class="px-4 py-2 bg-blue-100 text-blue-800 rounded-full font-medium">${interest}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                            <h3 class="text-xl font-bold text-gray-900 mb-4">Joined Clubs</h3>
+                            <div class="space-y-3">
+                                ${['Coding Club', 'AI/ML Club'].map(club => `
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 gradient-bg rounded-full flex items-center justify-center text-white font-bold">
+                                                ${club[0]}
+                                            </div>
+                                            <span class="font-medium text-gray-900">${club}</span>
+                                        </div>
+                                        <span class="text-sm text-gray-600">85 members</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                            <h3 class="text-xl font-bold text-gray-900 mb-4">Preferences</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-700">Notifications</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-700">Email Digest</span>
+                                    <select class="px-4 py-2 border border-gray-300 rounded-lg">
+                                        <option>Daily</option>
+                                        <option selected>Weekly</option>
+                                        <option>Monthly</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="confirmLogout()" class="w-full bg-red-500 text-white py-4 rounded-xl font-bold text-lg hover:bg-red-600 transition shadow-lg">
+                            Logout
+                        </button>
+                    </div>
+
+                    ${BottomNav('profile', 'student')}
+                </div>
+            `;
+        };
+
+        const StudentRecommendationsPage = () => {
+            if (!checkAuth('student')) {
+                router.navigate('/login/student');
+                return '';
+            }
+
+            const events = JSON.parse(localStorage.getItem('mockEvents') || '[]');
+            const recommended = events.filter(e => e.matchScore >= 75).slice(0, 5);
+
+            return `
+                <div class="min-h-screen bg-gray-50 pb-20 md:pb-0 fade-in">
+                    ${Header('AI Recommendations', true, true)}
+
+                    <div class="max-w-7xl mx-auto px-4 py-6">
+                        <div class="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl shadow-md p-8 mb-8 slide-up">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-6">🤖 How AI Picked These For You</h2>
+                            <div class="space-y-3">
+                                ${[
+                                    'Your department (Computer Science)',
+                                    'Events you attended (4 events)',
+                                    'Clubs you joined (2 clubs)',
+                                    'Your interests (Tech, Innovation, Hackathons)',
+                                    'Students like you (125 similar students)'
+                                ].map((item, i) => `
+                                    <div class="flex items-center gap-3 stagger-item" style="transform: translateX(-20px); animation-delay: ${i * 0.05}s">
+                                        <svg class="w-6 h-6 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        <span class="text-gray-700">${item}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <h3 class="text-2xl font-bold text-gray-900 mb-6">Top 5 Recommended Events</h3>
+                        <div class="space-y-6">
+                            ${recommended.map((event, i) => `
+                                <div class="card-3d bg-white rounded-xl shadow-md p-6 stagger-item" style="transform: translateX(-20px); animation-delay: ${i * 0.05}s">
+                                    <div class="flex flex-col lg:flex-row gap-6">
+                                        <div class="flex-1">
+                                            <div class="flex items-start justify-between mb-3">
+                                                <h4 class="text-xl font-bold text-gray-900">${event.title}</h4>
+                                                <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">${event.category}</span>
+                                            </div>
+                                            <p class="text-gray-600 mb-4">${event.description}</p>
+                                            <div class="space-y-2 mb-4">
+                                                <div class="flex items-center gap-2 text-sm text-gray-600">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                    <span>${event.date} at ${event.time}</span>
+                                                </div>
+                                                <div class="flex items-center gap-2 text-sm text-gray-600">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                                    </svg>
+                                                    <span>${event.location}</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center gap-2 mb-4">
+                                                <span class="text-sm text-gray-600">💡 ${event.reason}</span>
+                                            </div>
+                                            <div class="flex items-center gap-2 mb-4">
+                                                <span class="text-sm text-gray-600">Similar students going: 23</span>
+                                            </div>
+                                        </div>
+                                        <div class="lg:w-48 flex flex-col justify-between">
+                                            <div class="mb-4">
+                                                <div class="text-center mb-2">
+                                                    <span class="text-3xl font-bold text-green-600">${event.matchScore}%</span>
+                                                    <p class="text-sm text-gray-600">Match Score</p>
+                                                </div>
+                                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                                    <div class="gradient-bg h-3 rounded-full" style="width: ${event.matchScore}%"></div>
+                                                </div>
+                                            </div>
+                                            <button onclick="rsvpEvent(${event.id}, this)" class="w-full gradient-bg text-white py-3 rounded-lg font-bold btn-ripple hover:scale-105 transition">
+                                                RSVP
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    ${BottomNav('home', 'student')}
+                </div>
+            `;
+        };
+
+        const FacultyDashboard = () => {
+            if (!checkAuth('faculty')) {
+                router.navigate('/login/faculty');
+                return '';
+            }
+
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const complaints = JSON.parse(localStorage.getItem('mockComplaints') || '[]');
+            const pendingComplaints = complaints.filter(c => c.status === 'Open').slice(0, 3);
+
+            return `
+                <div class="min-h-screen bg-gray-50 pb-20 md:pb-0 fade-in">
+                    ${Header('Faculty Portal', false, true)}
+
+                    <div class="max-w-7xl mx-auto px-4 py-6">
+                        <div class="mb-8 slide-up">
+                            <h1 class="text-3xl font-bold text-gray-900 mb-2">${getTimeGreeting()}, ${user.name}!</h1>
+                            <p class="text-gray-600">Faculty Dashboard Overview</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div class="card-3d bg-red-50 p-6 rounded-xl shadow-md slide
